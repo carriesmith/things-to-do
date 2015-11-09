@@ -1,0 +1,29 @@
+{
+  "name": "things-to-do",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "jsonwebtoken": "^5.4.1",
+    "method-override": "^2.3.5",
+    "mongoose": "^4.2.4",
+    "morgan": "^1.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carriesmith/things-to-do.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carriesmith/things-to-do/issues"
+  },
+  "homepage": "https://github.com/carriesmith/things-to-do#readme"
+}

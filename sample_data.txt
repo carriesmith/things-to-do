@@ -1,0 +1,44 @@
+{
+    
+    "eventname": "test 1",
+    "shortdesc": "test",
+    "longdesc": "test",
+    "starttime": "Mon Nov 09 2015 16:00:00 GMT-0500 (EST)",
+    "endtime":   "Mon Nov 09 2015 22:30:00 GMT-0500 (EST)",
+    "location": [-73.9866277, 40.7366741],
+    "venuename": "The Stand",
+    "address": "239 3rd Ave, New York, NY 10003",
+    "price": "free",
+    "link": "http://thestand.laughstub.com/event.cfm?id=420244&cart"
+
+}
+
+{
+    
+    "eventname": "test 2",
+    "shortdesc": "test",
+    "longdesc": "test",
+    "starttime": "Mon Nov 09 2015 18:00:00 GMT-0500 (EST)",
+    "endtime":   "Mon Nov 09 2015 23:30:00 GMT-0500 (EST)",
+    "location": [-73.9866277, 40.7366741],
+    "venuename": "The Stand",
+    "address": "239 3rd Ave, New York, NY 10003",
+    "price": "free",
+    "link": "http://thestand.laughstub.com/event.cfm?id=420244&cart"
+
+}
+
+{
+    
+    "eventname": "test 3",
+    "shortdesc": "test",
+    "longdesc": "test",
+    "starttime": "Mon Nov 09 2015 08:00:00 GMT-0500 (EST)",
+    "endtime":   "Mon Nov 09 2015 14:30:00 GMT-0500 (EST)",
+    "location": [-73.9866277, 40.7366741],
+    "venuename": "The Stand",
+    "address": "239 3rd Ave, New York, NY 10003",
+    "price": "free",
+    "link": "http://thestand.laughstub.com/event.cfm?id=420244&cart"
+
+}

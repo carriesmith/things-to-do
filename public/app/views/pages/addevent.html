@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Add a new event</title>
+
+	<!-- CSS -->
+	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../../../bower_components/bootstrap/dist/css/bootstrap.css"/>
+
+
+    <link rel="stylesheet" href="../../../assets/css/style.css"/>
+    <link rel="stylesheet" type="text/css" media="screen"
+     href="http://tarruda.github.com/bootstrap-datetimepicker/assets/css/bootstrap-datetimepicker.min.css">
+
+    
+    <!-- Google Maps API -->
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0NKyN3Bv-CaMTQuSIT2OcVV21IfTWcg0"></script>    
+    <!-- JS Source -->
+    <script src="../../../../bower_components/jquery/jquery.js"></script>
+    <script src="../../../../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+     <script type="text/javascript"
+      src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js">
+     </script>
+     <script type="text/javascript"
+      src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.pt-BR.js">
+     </script>
+
+	<!--
+    <script src="../../../../bower_components/angular/angular.js"></script>
+    <script src="../../../../bower_components/angular-route/angular-route.js"></script>
+    <script src="../../../../bower_components/angularjs-geolocation/dist/angularjs-geolocation.min.js"></script>
+	-->
+
+</head>
+<body>
+	
+	<div class="container">
+		
+		<div class="header">
+			<h3 class="text-muted">Add a New Event</h3>
+		</div>	
+	
+		<!-- Map and Side Panel -->
+
+		<div class="row content">
+			
+			<div class="col-md-6">
+				
+				<!-- Form to enter event information -->
+				<!-- Creates Form (novalidate disables HTML validation, Angular will control) -->
+                <form name ="addEventForm">
+                	
+					<div class="form-group">
+                        <label for="username">Event Name</label>
+                        <input type="text" class="form-control" id="eventname" placeholder="" required>
+                  	</div>
+
+					<div class="form-group">
+					  <label for="shortdesc">Short Description</label>
+					  <textarea class="form-control" rows="2" id="shortdesc" maxlength='50' required></textarea>
+					</div>
+
+					<div class="form-group">
+					  <label for="longdesc">Long Description</label>
+					  <textarea class="form-control" rows="5" id="longdesc" maxlength='1000' required></textarea>
+					</div>
+
+					<div class="form-group">
+	                    <label for="price">Price of Admission</label>
+	                    <input type="text" class="form-control" id="price" placeholder="" required>
+	              	</div>
+
+					<div class="form-group">
+						<label for="eventdate">Event Date</label>
+		              	<div id="eventdate" class="input-append date">
+		              	  <input type="text"  style='height: 30px'></input>
+		              	  <span class="add-on" style='height: 30px'>
+		              	    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+		              	  </span>
+		              	</div>
+					</div>
+
+					<div class="form-group">
+						<label for="starttime">Start Time</label>
+		              	<div id="starttime" class="input-append">
+		              	  <input data-format="hh:mm:ss" type="text" style='height: 30px'></input>
+		              	  <span class="add-on" style='height: 30px'>
+		              	    <i data-time-icon="icon-time" data-date-icon="icon-time">
+		              	    </i>
+		              	  </span>
+		              	</div>
+	              	</div>
+
+					<div class="form-group">
+						<label for="endtime">End Time</label>
+		              	<div id="endtime" class="input-append">
+		              	  <input data-format="hh:mm:ss" type="text" style='height: 30px'></input>
+		              	  <span class="add-on" style='height: 30px'>
+		              	    <i data-time-icon="icon-time" data-date-icon="icon-time">
+		              	    </i>
+		              	  </span>
+		              	</div>
+					</div>
+
+					<div class="form-group">
+	                    <label for="latitude">Latitude</label>
+	                    <input type="text" class="form-control" id="latitude" value="39.500" required>
+	                </div>
+
+	                <div class="form-group">
+	                    <label for="longitude">Longitude</label>
+	                    <input type="text" class="form-control" id="longitude" value="-98.350" required>
+	                </div>
+
+    				<div class="form-group">
+                        <label for="venuename">Venue Name</label>
+                        <input type="text" class="form-control" id="venuename" placeholder="" required>
+                  	</div>
+
+                  	<div class="form-group">
+                  	  <label for="address">Address</label>
+                  	  <textarea class="form-control" rows="2" id="address" maxlength='50' required></textarea>
+                  	</div>
+
+	                <!-- Submit button. Will be linked to createEvent() function . Also note ng-disabled logic which prevents early submits.  -->
+	                <button type="submit" class="btn btn-block">Submit</button>
+
+                </form>
+
+			</div>
+
+			<!-- This will be a map -->
+			<div class="col-md-6">
+
+				<img src="http://placehold.it/450x450">
+
+			</div>
+
+		</div> <!-- end .row-content -->
+
+	</div>
+
+	<hr/>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p class="text-center">Wasson?</p>
+    </div>
+
+    <script type="text/javascript">
+      $('#eventdate').datetimepicker({
+        pickTime: false
+      });
+
+      $('#starttime').datetimepicker({
+        pickDate: false
+      });
+
+      $('#endtime').datetimepicker({
+        pickDate: false
+      });
+    </script>
+
+</body>
+</html>
