@@ -8,15 +8,15 @@ var EventSchema = new Schema({
   eventname: {type: String, required: true},
   shortdesc: {type: String, required: true},
   longdesc: {type: String, required: true},
+  price: {type: String, required: true},
   starttime: {type: Date, default: Date.now},
   endtime: {type: Date, default: Date.now},
   location: {type: [Number], required: true}, // [Long, Lat]
   venuename: {type: String, required: true},
   address: {type: String, required: true},
-  price: {type: String, required: true},
+  link: {type: String, required: false},
   created_at: {type: Date, default: Date.now},
   updated_at: {type: Date, default: Date.now},
-  link: {type: String, required: true}
 });
 
 // Sets the created_at parameter equal to the current time

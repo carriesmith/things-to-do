@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Event = require('../models/events.js');
+var path = require('path');
 
 // Open app routes
 module.exports = function(app, express){
@@ -11,7 +12,27 @@ module.exports = function(app, express){
   // ---------------------------------------
   // Retrieve records for all events in the db
 
-  app.get('/events', function(req,res){
+  // app.post('/addevent', function(req, res) {
+
+  //   // concatenate date of event with start time & end time
+  //   var starttime = new Date(req.body.eventdate + ' ' + req.body.starttime);
+  //   var endtime = new Date(req.body.eventdate + ' ' + req.body.endtime);
+
+  //   // if the starttime is later than the endtime, then the event 
+  //   // rolls into the next day. Add +1 to the date for the endtime.
+  //   if (starttime > endtime) {
+  //     endtime.setDate(endtime.getDate() + 1);
+  //   }
+
+  //   req.body.starttime = starttime;
+  //   req.body.endtime = endtime;
+
+  //   res.send(req.body);
+
+  // });
+
+  app.route('/events')
+  .get(function(req,res){
     // Uses Mongoose schema to run the search (empty conditions)
     var query = Event.find({});
     query.exec(function(err, events){
@@ -31,14 +52,34 @@ module.exports = function(app, express){
 
   app.post('/events', function(req, res){
 
-    // Creates a new user based on the Mongoose schema
+    // Do some manipulation of the addevent form elements to 
+    // match the event schema.
+
+    // concatenate date of event with start time & end time
+    var starttime = new Date(req.body.eventdate + ' ' + req.body.starttime);
+    var endtime = new Date(req.body.eventdate + ' ' + req.body.endtime);
+
+    // if the starttime is later than the endtime, then the event 
+    // rolls into the next day. Add +1 to the date for the endtime.
+    if (starttime > endtime) {
+      endtime.setDate(endtime.getDate() + 1);
+    }
+
+    req.body.starttime = starttime;
+    req.body.endtime = endtime;
+
+    req.body.location = [req.body.longitude, req.body.latitude];
+
+    // Creates a new event based on the Mongoose schema
     // and add the post to body
 
     var newevent = new Event(req.body);
 
+    // ??? Necessary to do a type conversion here ???
     newevent.starttime = new Date(newevent.starttime);
     newevent.endtime = new Date(newevent.endtime);
 
+    // Save new event to the database.
     newevent.save(function(err){
       if(err)
         res.send(err);
@@ -48,6 +89,8 @@ module.exports = function(app, express){
       res.json(req.body);
 
     });
+
+    // res.send(newevent);
 
   });
 
@@ -71,7 +114,7 @@ module.exports = function(app, express){
         , function(err, events){
         if(err) res.send(err);
 
-        // return the user
+        // // return the user
         res.json(events);
 
       }); // close Event.findById

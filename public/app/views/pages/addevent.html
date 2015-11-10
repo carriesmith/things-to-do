@@ -50,32 +50,32 @@
 				
 				<!-- Form to enter event information -->
 				<!-- Creates Form (novalidate disables HTML validation, Angular will control) -->
-                <form name ="addEventForm">
+                <form name ="addEventForm" action="/events" method='POST' onsubmit="this.submit(); this.reset(); return false;">
                 	
 					<div class="form-group">
-                        <label for="username">Event Name</label>
-                        <input type="text" class="form-control" id="eventname" placeholder="" required>
+                        <label for="eventname">Event Name</label>
+                        <input name='eventname' type="text" class="form-control" id="eventname" value="Test Form" required>
                   	</div>
 
 					<div class="form-group">
 					  <label for="shortdesc">Short Description</label>
-					  <textarea class="form-control" rows="2" id="shortdesc" maxlength='50' required></textarea>
+					  <textarea name='shortdesc' class="form-control" rows="2" id="shortdesc" maxlength='50' required>short description</textarea>
 					</div>
 
 					<div class="form-group">
 					  <label for="longdesc">Long Description</label>
-					  <textarea class="form-control" rows="5" id="longdesc" maxlength='1000' required></textarea>
+					  <textarea name='longdesc' class="form-control" rows="5" id="longdesc" maxlength='1000' required>long description</textarea>
 					</div>
 
 					<div class="form-group">
 	                    <label for="price">Price of Admission</label>
-	                    <input type="text" class="form-control" id="price" placeholder="" required>
+	                    <input name='price' type="text" class="form-control" id="price" value="0" required>
 	              	</div>
 
 					<div class="form-group">
 						<label for="eventdate">Event Date</label>
 		              	<div id="eventdate" class="input-append date">
-		              	  <input type="text"  style='height: 30px'></input>
+		              	  <input name='eventdate' type="text"  style='height: 30px'></input>
 		              	  <span class="add-on" style='height: 30px'>
 		              	    <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
 		              	  </span>
@@ -85,7 +85,7 @@
 					<div class="form-group">
 						<label for="starttime">Start Time</label>
 		              	<div id="starttime" class="input-append">
-		              	  <input data-format="hh:mm:ss" type="text" style='height: 30px'></input>
+		              	  <input name='starttime' data-format="hh:mm:ss" type="text" style='height: 30px'></input>
 		              	  <span class="add-on" style='height: 30px'>
 		              	    <i data-time-icon="icon-time" data-date-icon="icon-time">
 		              	    </i>
@@ -96,7 +96,7 @@
 					<div class="form-group">
 						<label for="endtime">End Time</label>
 		              	<div id="endtime" class="input-append">
-		              	  <input data-format="hh:mm:ss" type="text" style='height: 30px'></input>
+		              	  <input name='endtime' data-format="hh:mm:ss" type="text" style='height: 30px'></input>
 		              	  <span class="add-on" style='height: 30px'>
 		              	    <i data-time-icon="icon-time" data-date-icon="icon-time">
 		              	    </i>
@@ -104,25 +104,26 @@
 		              	</div>
 					</div>
 
-					<div class="form-group">
-	                    <label for="latitude">Latitude</label>
-	                    <input type="text" class="form-control" id="latitude" value="39.500" required>
-	                </div>
-
-	                <div class="form-group">
-	                    <label for="longitude">Longitude</label>
-	                    <input type="text" class="form-control" id="longitude" value="-98.350" required>
-	                </div>
-
     				<div class="form-group">
                         <label for="venuename">Venue Name</label>
-                        <input type="text" class="form-control" id="venuename" placeholder="" required>
+                        <input name='venuename' type="text" class="form-control" id="venuename" value="Venue" required>
                   	</div>
 
                   	<div class="form-group">
                   	  <label for="address">Address</label>
-                  	  <textarea class="form-control" rows="2" id="address" maxlength='50' required></textarea>
+                  	  <textarea name='address' class="form-control" rows="2" id="address" maxlength='50' value= 'address' required>Address</textarea>
                   	</div>
+
+
+  					<div class="form-group">
+  	                    <label for="latitude">Latitude</label>
+  	                    <input name='latitude' type="text" class="form-control" id="latitude" value="39.500" required>
+  	                </div>
+
+  	                <div class="form-group">
+  	                    <label for="longitude">Longitude</label>
+  	                    <input name='longitude' type="text" class="form-control" id="longitude" value="-98.350" required>
+  	                </div>
 
 	                <!-- Submit button. Will be linked to createEvent() function . Also note ng-disabled logic which prevents early submits.  -->
 	                <button type="submit" class="btn btn-block">Submit</button>

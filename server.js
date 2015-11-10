@@ -13,8 +13,9 @@ var app             = express();
 // Sets the connection to MongoDB
 mongoose.connect("mongodb://localhost:27017/wassondb");
 
-// Logging and Parsing
-app.use(express.static(__dirname + '/public/app/views'));                 // sets the static files location to public
+// This makes everything nested under /public/app/views public
+app.use( express.static(__dirname + '/public/app/views') );
+
 app.use('/bower_components',  express.static(__dirname + '/bower_components')); // Use BowerComponents
 app.use(morgan('dev'));                                         // log with Morgan
 app.use(bodyParser.json());                                     // parse application/json
@@ -22,6 +23,11 @@ app.use(bodyParser.urlencoded({extended: true}));               // parse applica
 app.use(bodyParser.text());                                     // allows bodyParser to look at raw text
 app.use(bodyParser.json({ type: 'application/vnd.api+json'}));  // parse application/vnd.api+json as json
 app.use(methodOverride());
+
+// Routes to Static Pages
+// ------------------------------------------------------
+app.use( '/addevent', express.static(__dirname + '/public/app/views/pages/addevent.html') );
+
 
 // Routes
 // ------------------------------------------------------
