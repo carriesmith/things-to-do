@@ -12,25 +12,6 @@ module.exports = function(app, express){
   // ---------------------------------------
   // Retrieve records for all events in the db
 
-  // app.post('/addevent', function(req, res) {
-
-  //   // concatenate date of event with start time & end time
-  //   var starttime = new Date(req.body.eventdate + ' ' + req.body.starttime);
-  //   var endtime = new Date(req.body.eventdate + ' ' + req.body.endtime);
-
-  //   // if the starttime is later than the endtime, then the event 
-  //   // rolls into the next day. Add +1 to the date for the endtime.
-  //   if (starttime > endtime) {
-  //     endtime.setDate(endtime.getDate() + 1);
-  //   }
-
-  //   req.body.starttime = starttime;
-  //   req.body.endtime = endtime;
-
-  //   res.send(req.body);
-
-  // });
-
   app.route('/events')
   .get(function(req,res){
     // Uses Mongoose schema to run the search (empty conditions)

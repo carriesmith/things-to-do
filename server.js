@@ -14,7 +14,7 @@ var app             = express();
 mongoose.connect("mongodb://localhost:27017/wassondb");
 
 // This makes everything nested under /public/app/views public
-app.use( express.static(__dirname + '/public/app/views') );
+app.use( express.static(__dirname + '/public') );
 
 app.use('/bower_components',  express.static(__dirname + '/bower_components')); // Use BowerComponents
 app.use(morgan('dev'));                                         // log with Morgan
