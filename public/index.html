@@ -3,8 +3,45 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Landing</title>
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css"/>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+
+	<!-- JS Source -->
+    <script src="../bower_components/jquery/jquery.js"></script>
+    <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
+  	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
+	<script src='../assets/js/home.js'></script>
+
 </head>
 <body>
-	<p>This will display events eventually.</p>
+
+	<div class="container">
+		<div class="header">
+			<h2>What's On</h2>
+		</div>
+
+		<div class="row-content">
+			
+			<!-- Map -->
+		    <div class="col-md-5">
+		      <!-- <div id="map" style="width:645px; height:645px"></div> -->
+		      <img src="http://placehold.it/450x450">
+		    </div>
+
+		    <div class="col-md-7">
+
+				<ul id="eventList" class="connected">
+					
+				</ul>
+
+		    </div>
+
+		</div>
+
+	</div>
+
 </body>
 </html>

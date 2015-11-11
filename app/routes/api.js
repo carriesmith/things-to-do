@@ -71,8 +71,6 @@ module.exports = function(app, express){
 
     });
 
-    // res.send(newevent);
-
   });
 
   // http://localhost:3000/events/date/2015-11-09T20:00:00/2015-11-10T05:30:00/

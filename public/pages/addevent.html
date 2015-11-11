@@ -9,33 +9,22 @@
 	<title>Add a new event</title>
 
 	<!-- CSS -->
-	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+ 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../bower_components/bootstrap/dist/css/bootstrap.css"/>
-
 
     <link rel="stylesheet" href="../assets/css/style.css"/>
     <link rel="stylesheet" type="text/css" media="screen"
      href="http://tarruda.github.com/bootstrap-datetimepicker/assets/css/bootstrap-datetimepicker.min.css">
-
-    
+   
     <!-- Google Maps API -->
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0NKyN3Bv-CaMTQuSIT2OcVV21IfTWcg0"></script>    
+
     <!-- JS Source -->
     <script src="../../bower_components/jquery/jquery.js"></script>
     <script src="../../bower_components/bootstrap/dist/js/bootstrap.js"></script>
 
-     <script type="text/javascript"
-      src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js">
-     </script>
-     <script type="text/javascript"
-      src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.pt-BR.js">
-     </script>
-
-	<!--
-    <script src="../../../../bower_components/angular/angular.js"></script>
-    <script src="../../../../bower_components/angular-route/angular-route.js"></script>
-    <script src="../../../../bower_components/angularjs-geolocation/dist/angularjs-geolocation.min.js"></script>
-	-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+	<script type="text/javascript" src="http://tarruda.github.com/bootstrap-datetimepicker/assets/js/bootstrap-datetimepicker.min.js"></script>
 
 </head>
 <body>
@@ -54,26 +43,26 @@
 				
 				<!-- Form to enter event information -->
 				<!-- Creates Form (novalidate disables HTML validation, Angular will control) -->
-                <form name ="addEventForm" action="/events" method='POST' onsubmit="this.submit(); this.reset(); return false;">
+                <form name ="addEventForm" action="/events" method='POST'>
                 	
 					<div class="form-group">
                         <label for="eventname">Event Name</label>
-                        <input name='eventname' type="text" class="form-control" id="eventname" value="Test Form" required>
+                        <input name='eventname' type="text" class="form-control" id="eventname" required>
                   	</div>
 
 					<div class="form-group">
 					  <label for="shortdesc">Short Description</label>
-					  <textarea name='shortdesc' class="form-control" rows="2" id="shortdesc" maxlength='50' required>short description</textarea>
+					  <textarea name='shortdesc' class="form-control" rows="2" id="shortdesc" maxlength='200' required></textarea>
 					</div>
 
 					<div class="form-group">
 					  <label for="longdesc">Long Description</label>
-					  <textarea name='longdesc' class="form-control" rows="5" id="longdesc" maxlength='1000' required>long description</textarea>
+					  <textarea name='longdesc' class="form-control" rows="5" id="longdesc" maxlength='1000' required></textarea>
 					</div>
 
 					<div class="form-group">
-	                    <label for="price">Price of Admission</label>
-	                    <input name='price' type="text" class="form-control" id="price" value="0" required>
+	                    <label for="price">Price</label>
+	                    <input name='price' type="text" class="form-control" id="price" required>
 	              	</div>
 
 					<div class="form-group">
@@ -87,46 +76,38 @@
 					</div>
 
 					<div class="form-group">
-						<label for="starttime">Start Time</label>
-		              	<div id="starttime" class="input-append">
-		              	  <input name='starttime' data-format="hh:mm:ss" type="text" style='height: 30px'></input>
-		              	  <span class="add-on" style='height: 30px'>
-		              	    <i data-time-icon="icon-time" data-date-icon="icon-time">
-		              	    </i>
-		              	  </span>
-		              	</div>
+	                    <label for="price">Start Time</label>
+	                    <input name='starttime' type="text" class="form-control" id="starttime" required>
 	              	</div>
 
-					<div class="form-group">
-						<label for="endtime">End Time</label>
-		              	<div id="endtime" class="input-append">
-		              	  <input name='endtime' data-format="hh:mm:ss" type="text" style='height: 30px'></input>
-		              	  <span class="add-on" style='height: 30px'>
-		              	    <i data-time-icon="icon-time" data-date-icon="icon-time">
-		              	    </i>
-		              	  </span>
-		              	</div>
-					</div>
+  					<div class="form-group">
+  	                    <label for="endtime">End Time</label>
+  	                    <input name='endtime' type="text" class="form-control" id="endtime" required>
+  	              	</div>
 
     				<div class="form-group">
                         <label for="venuename">Venue Name</label>
-                        <input name='venuename' type="text" class="form-control" id="venuename" value="Venue" required>
+                        <input name='venuename' type="text" class="form-control" id="venuename" required>
                   	</div>
 
                   	<div class="form-group">
                   	  <label for="address">Address</label>
-                  	  <textarea name='address' class="form-control" rows="2" id="address" maxlength='50' value= 'address' required>Address</textarea>
+                  	  <textarea name='address' class="form-control" rows="2" id="address" maxlength='200' required></textarea>
                   	</div>
-
 
   					<div class="form-group">
   	                    <label for="latitude">Latitude</label>
-  	                    <input name='latitude' type="text" class="form-control" id="latitude" value="39.500" required>
+  	                    <input name='latitude' type="text" class="form-control" id="latitude" required>
   	                </div>
 
   	                <div class="form-group">
   	                    <label for="longitude">Longitude</label>
-  	                    <input name='longitude' type="text" class="form-control" id="longitude" value="-98.350" required>
+  	                    <input name='longitude' type="text" class="form-control" id="longitude" required>
+  	                </div>
+
+  	                <div class="form-group">
+  	                  <label for="link">Link</label>
+  	                  <textarea name='link' class="form-control" rows="2" id="link"></textarea>
   	                </div>
 
 	                <!-- Submit button. Will be linked to createEvent() function . Also note ng-disabled logic which prevents early submits.  -->
@@ -159,13 +140,6 @@
         pickTime: false
       });
 
-      $('#starttime').datetimepicker({
-        pickDate: false
-      });
-
-      $('#endtime').datetimepicker({
-        pickDate: false
-      });
     </script>
 
 </body>
