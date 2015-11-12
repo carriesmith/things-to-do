@@ -121,6 +121,20 @@ module.exports = function(app, express){
 
           }); // close User.findById
         })
+        .put(function(req,res){
+          Event.findById(req.params.event_id, function(err, event){
+            if (err) res.send(err);
+
+            // cycle through json request keys
+            for (var key in req.body) {
+              event[key] = req.body[key];
+            }
+            event.save(function(err){
+              if (err) res.send(err);
+              res.send("UPDATED!");
+            });
+          })
+        })
         .delete(function(req, res){
           Event.remove({
               _id: req.params.event_id
