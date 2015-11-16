@@ -60,7 +60,7 @@ button:focus { outline:0 !important; }
 
 .infosection {
 	position: relative;
-	padding: 5px;
+	padding: 5px 5px 0px;
 }
 
 .eventname a {

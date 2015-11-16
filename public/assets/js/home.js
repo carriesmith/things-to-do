@@ -27,8 +27,10 @@ app.timelineD3 = function(timesvg, eventItem, height, width){
 									'x': timeScale(new Date(data[0].starttime)),
 									'width': timeScale(new Date(data[0].endtime)) - timeScale(new Date(data[0].starttime)),
 									'y': height+2,
-									'height': 10,
-									'fill': '#136E71',
+									'height': 8,
+									'fill': '#fff',
+									'stroke': '#136E71',
+									'stroke-width': 2,
 									'opacity': .75,
 									'rx': 2,
 									'ry': 2
