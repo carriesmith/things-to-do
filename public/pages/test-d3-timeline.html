@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Test d3 Timeline</title>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.8/d3.min.js"></script>
+	<script src="../../bower_components/jquery/jquery.js"></script>
+
+	<style>
+		path, line {
+		    fill: none;
+		    stroke: #575757;
+		    shape-rendering: crispEdges;
+		}
+
+		text {
+			font: 9px sans-serif;
+		}
+
+		svg{
+			/*background-color: lightgrey;*/
+		}
+	</style>
+
+</head>
+<body>
+	
+	<div class="container">
+		<h2>D3 Graphic</h2>
+		<section id="chart"></section>
+	</div>
+
+	<script>
+
+		var viewTimes = [{starttime: "2015-11-10T09:00:00.000Z", endtime: "2015-11-11T09:00:00.000Z"}]
+		var data = [{starttime: "2015-11-10T19:00:00.000Z", endtime: "2015-11-11T01:00:00.000Z"}]
+
+		// Chart parameters
+		var margin = {	top: 0, 
+						right: 0,
+						bottom: 20,
+						left: 0 };
+
+		var height = 40 - margin.top - margin.bottom,
+			width = 300 - margin.left - margin.right;
+
+		var timeScale = d3.time.scale.utc()
+							.domain([new Date(viewTimes[0].starttime), new Date(viewTimes[0].endtime)])
+							.range([0, width]);
+
+		var _containerElem = $('#chart')[0];
+
+		var timeChart = d3.select(_containerElem)
+							.append('svg')
+								.attr('width', width + margin.left + margin.right)
+								.attr('height', height + margin.top + margin.bottom)
+							.append('rect')
+								.attr({
+									'x': timeScale(new Date(data[0].starttime)),
+									'width': timeScale(new Date(data[0].endtime)) - timeScale(new Date(data[0].starttime)),
+									'y': 5,
+									'height': 12,
+									'fill': '#136E71',
+									'opacity': .75,
+									'rx': 2,
+									'ry': 2
+								})
+								.attr('transform', 'translate(' + margin.left + ', ' + 0 + ')');
+
+		var timeAxis = d3.svg.axis()
+							.scale(timeScale)
+							.orient('bottom');
+							//.ticks(d3.time.hour, 6);
+
+		var timeGuide = d3.select(_containerElem)
+							.select('svg')
+							.append('g')
+							.attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
+
+		timeAxis(timeGuide);
+
+
+	</script>
+
+</body>
+</html>
