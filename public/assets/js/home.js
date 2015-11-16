@@ -66,6 +66,15 @@ app.displayEvents = function(){
 
 	app.eventList.forEach(function(eventItem){
 
+		// Process start / end times correct for UTC offset
+		eventItem.starttime = new Date(eventItem.starttime);
+		eventItem.starttime = new Date(eventItem.starttime.getFullYear(), eventItem.starttime.getMonth(), eventItem.starttime.getDate(), eventItem.starttime.getHours() + app.utcOffset,eventItem.starttime.getMinutes(),0)
+							.toISOString();
+		eventItem.endtime = new Date(eventItem.endtime);
+		eventItem.endtime = new Date(eventItem.endtime.getFullYear(), eventItem.endtime.getMonth(), eventItem.endtime.getDate(), eventItem.endtime.getHours() + app.utcOffset,eventItem.endtime.getMinutes(),0)
+							.toISOString();
+		
+
 		// create new list item for an event
 		var li = $('<li>').addClass('eventitem');
 
@@ -157,9 +166,15 @@ app.init = function(){
 	
 	app.today = new Date();
 
-	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), 4,0,0)
+	app.utcOffset = parseInt(moment().format("Z").slice(0,3));
+
+	app.defaultStart = 9 + app.utcOffset;
+
+	app.defaultend = 6 + app.utcOffset;
+
+	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), app.defaultStart,0,0)
 							.toISOString();
-	app.endtime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, 1,0,0)
+	app.endtime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, app.defaultend,0,0)
 							.toISOString();
 
 	$.ajax({
