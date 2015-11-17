@@ -5,15 +5,14 @@
 	<title>Landing</title>
 
 	<!-- CSS -->
-	<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css"/>
 	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-	<link href='https://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" href="assets/css/home.css"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 
 	<!-- JS Source -->
     <script src="../bower_components/jquery/jquery.js"></script>
-    <script src="../bower_components/bootstrap/dist/js/bootstrap.js"></script>
   	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
   	<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
   	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.8/d3.min.js"></script>
@@ -26,18 +25,81 @@
 
 	<div class="container">
 		<div class="header">
-			<h2>Friday, Nov 13. 9am - 6am.</h2>
+			<div id="date-select" class="wrapper-dropdown">
+				<span>Mon, Nov 16</span>
+				<ul class="dropdown">
+					<li><a href="#">Tues, Nov 17</a></li>
+					<li><a href="#">Wed, Nov 18</a></li>
+					<li><a href="#">Thurs, Nov 19</a></li>
+					<li><a href="#">Fri, Nov 20</a></li>
+					<li><a href="#">Sat, Nov 21</a></li>
+					<li><a href="#">Sun, Nov 22</a></li>
+				</ul>
+			</div> 
+
+			<div id="start-select" class="wrapper-dropdown">
+				<span>9</span>
+				<ul class="dropdown">
+					<li><a href="#">1</a></li>
+					<li><a href="#">2</a></li>
+					<li><a href="#">3</a></li>
+					<li><a href="#">4</a></li>
+					<li><a href="#">5</a></li>
+					<li><a href="#">6</a></li>
+					<li><a href="#">7</a></li>
+					<li><a href="#">8</a></li>
+					<li><a href="#">9</a></li>
+					<li><a href="#">10</a></li>
+					<li><a href="#">11</a></li>
+					<li><a href="#">12</a></li>
+				</ul>
+			</div> 
+
+			<div id="start-ampm" class="wrapper-dropdown">
+				<span>am</span>
+				<ul class="dropdown">
+					<li><a href="#">am</a></li>
+					<li><a href="#">pm</a></li>
+				</ul>
+			</div> 
+
+			<span> - </span>
+
+			<div id="end-select" class="wrapper-dropdown">
+				<span>9</span>
+				<ul class="dropdown">
+					<li><a href="#">1</a></li>
+					<li><a href="#">2</a></li>
+					<li><a href="#">3</a></li>
+					<li><a href="#">4</a></li>
+					<li><a href="#">5</a></li>
+					<li><a href="#">6</a></li>
+					<li><a href="#">7</a></li>
+					<li><a href="#">8</a></li>
+					<li><a href="#">9</a></li>
+					<li><a href="#">10</a></li>
+					<li><a href="#">11</a></li>
+					<li><a href="#">12</a></li>
+				</ul>
+			</div> 
+
+			<div id="end-ampm" class="wrapper-dropdown">
+				<span>am</span>
+				<ul class="dropdown">
+					<li><a href="#">am</a></li>
+					<li><a href="#">pm</a></li>
+				</ul>
+			</div> 
+
 		</div>
 
-		<div class="row-content">
+		<div class="wrapper-content">
 			
 			<!-- Map -->
-		    <div class="col-md-5 map-container">
+		    <div class="map-container">
 		      <div id="map"></div>
 		      <!-- <img src="http://placehold.it/450x450"> -->
-		    </div>
-
-		    <div class="col-md-7 info-container">
+		    </div><div class="info-container">
 
 				<ul id="eventList" class="connected">
 					

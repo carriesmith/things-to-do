@@ -28,8 +28,8 @@ app.timelineD3 = function(timesvg, eventItem, height, width){
 									'width': timeScale(new Date(data[0].endtime)) - timeScale(new Date(data[0].starttime)),
 									'y': height+2,
 									'height': 8,
-									'fill': '#fff',
-									'stroke': '#136E71',
+									'fill': '#ad0025',
+									'stroke': '#ad0025',
 									'stroke-width': 2,
 									'opacity': .75,
 									'rx': 2,
@@ -74,6 +74,25 @@ app.displayEvents = function(){
 		eventItem.endtime = new Date(eventItem.endtime.getFullYear(), eventItem.endtime.getMonth(), eventItem.endtime.getDate(), eventItem.endtime.getHours() + app.utcOffset,eventItem.endtime.getMinutes(),0)
 							.toISOString();
 		
+		// Process event price
+		// see: http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
+		// parseFloat parses its argument, a string, and returns a floating point number. 
+		// 		If it encounters a character other than a sign (+ or -), numeral (0-9), a decimal point, 
+		// 		or an exponent, it returns the value up to that point and ignores that character 
+		// 		and all succeeding characters. Leading and trailing spaces are allowed.
+		// 		If the first character cannot be converted to a number, parseFloat returns NaN.
+		// isFinite used to determine whether a number is a finite number. 
+		// 		The isFinite function examines the number in its argument. 
+		// 		If the argument is NaN, positive infinity, or negative infinity, 
+		// 		this method returns false; otherwise, it returns true.
+
+		if (eventItem.price === 0){
+			eventItem.price = 'free';
+		}
+		if (!isNaN(parseFloat(eventItem.price)) && isFinite(eventItem.price)){
+			eventItem.price = '$' + eventItem.price;
+		}
+
 
 		// create new list item for an event
 		var li = $('<li>').addClass('eventitem');
@@ -84,7 +103,8 @@ app.displayEvents = function(){
 		// append event name
 		var name = $('<div>').append('<a href = "'+ eventItem.link + '" target="_blank">' + eventItem.eventname.toLowerCase() + '</a>').addClass('eventname');
 		// append price of admission
-		var price = $('<div>').append(eventItem.price).addClass('price');
+
+		var price = $('<div>').append(eventItem.price.toLowerCase()).addClass('price');
 
 		// shortdesc div contains the short description of the event
 		var shortdesc = $('<div>')
@@ -93,7 +113,7 @@ app.displayEvents = function(){
 		
 		var xButton = $('<div>')
 							.addClass('xbutton')
-							.append('<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>')
+							.append('<i class="fa fa-times"></i>')
 							.click(function(){
 								$(li).slideUp();
 								map.removeLayer(eventItem.marker);
@@ -101,11 +121,11 @@ app.displayEvents = function(){
 
 		var viewButton = $('<div>')
 								.addClass('viewbutton')
-								.append('<span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>')
+								.append('<i class="fa fa-caret-up"></i>')
 								.click(function(){
 									$(shortdesc).toggleClass('open');
-									$(this).find('span').toggleClass('glyphicon-chevron-down');
-									$(this).find('span').toggleClass('glyphicon-chevron-up');
+									$(this).find('i').toggleClass('fa-caret-up');
+									$(this).find('i').toggleClass('fa-caret-down');
 								});
 
 		var infosection = $('<div>')
@@ -121,7 +141,7 @@ app.displayEvents = function(){
 		li.append(infosection)
 			.append(timesvg);
 
-		app.timelineD3(timesvg[0], eventItem, 30, 645);
+		app.timelineD3(timesvg[0], eventItem, 30, 620);
 
 		// add start and end times as data attributes to list item element
 		li.attr('data-starttime', eventItem.starttime);
@@ -162,22 +182,8 @@ app.displayEvents = function(){
 
 }
 
-app.init = function(){
-	
-	app.today = new Date();
-
-	app.utcOffset = parseInt(moment().format("Z").slice(0,3));
-
-	app.defaultStart = 9 + app.utcOffset;
-
-	app.defaultend = 6 + app.utcOffset;
-
-	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), app.defaultStart,0,0)
-							.toISOString();
-	app.endtime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, app.defaultend,0,0)
-							.toISOString();
-
-	$.ajax({
+app.getData = function(){
+		$.ajax({
 		url: 'http://localhost:3000/events/date/' + app.starttime + '/' + app.endtime,
 		type: 'GET',
 		dataType: 'json',
@@ -195,6 +201,69 @@ app.init = function(){
 			app.displayEvents();
 		}
 	});
+
+}
+
+app.init = function(){
+	
+	app.today = new Date();
+
+	app.utcOffset = parseInt(moment().format("Z").slice(0,3));
+
+	app.defaultStart = 9 + app.utcOffset;
+
+	app.defaultEnd = 6 + app.utcOffset;
+
+	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), app.defaultStart,0,0)
+							.toISOString();
+	app.endtime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, app.defaultEnd,0,0)
+							.toISOString();
+
+	app.getData();
+
+	// Dropdowns adapted from:
+	// http://tympanus.net/codrops/2012/10/04/custom-drop-down-list-styling/
+
+	function DropDown(el) {
+	    this.dd = el;
+	    this.placeholder = this.dd.children('span');
+	    this.opts = this.dd.find('ul.dropdown > li');
+	    this.val = '';
+	    this.index = -1;
+	    this.initEvents();
+	}
+
+	DropDown.prototype = {
+	    initEvents : function() {
+	        var obj = this;
+
+	        obj.dd.on('click', function(event){
+	            $(this).toggleClass('active');
+	            return false;
+	        });
+
+	        obj.opts.on('click',function(){
+	            var opt = $(this);
+	            obj.val = opt.text();
+	            obj.index = opt.index();
+	            obj.placeholder.text(obj.val);
+	        });
+	    },
+	    getValue : function() {
+	        return this.val;
+	    },
+	    getIndex : function() {
+	        return this.index;
+	    }
+	}
+
+	app.ddDate = new DropDown( $('#date-select') );
+	app.ddSTime = new DropDown( $('#start-select') );
+	app.ddSTimeAMPM = new DropDown( $('#start-ampm') );
+	app.ddETime = new DropDown( $('#end-select') );
+	app.ddETimeAMPM = new DropDown( $('#end-ampm') );
+
+	$('.wrapper-dropdown').removeClass('active');
 
 };
 
