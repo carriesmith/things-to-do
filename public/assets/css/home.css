@@ -54,6 +54,10 @@ body{
     color: #fff;
 }
 
+#date-select.wrapper-dropdown{
+	margin-left: 20px;
+}
+
 #start-select.wrapper-dropdown,
 #start-ampm.wrapper-dropdown,
 #end-select.wrapper-dropdown,

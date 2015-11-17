@@ -2,8 +2,8 @@ var app = {};
 
 app.timelineD3 = function(timesvg, eventItem, height, width){
 
-		var viewTimes = [{starttime: app.starttime, endtime: app.endtime}]
-		var data = [{starttime: eventItem.starttime, endtime: eventItem.endtime}]
+		var viewTimes = [{starttime: new Date(app.starttime), endtime: new Date(app.endtime)}]
+		var data = [{starttime: new Date(eventItem.starttime), endtime: new Date(eventItem.endtime)}]
 
 		// Chart parameters
 		var margin = {	top: height, 
@@ -14,8 +14,8 @@ app.timelineD3 = function(timesvg, eventItem, height, width){
 		var height = height - margin.top - margin.bottom,
 			width = width - margin.left - margin.right;
 
-		var timeScale = d3.time.scale.utc()
-							.domain([new Date(viewTimes[0].starttime), new Date(viewTimes[0].endtime)])
+		var timeScale = d3.time.scale()
+							.domain([viewTimes[0].starttime, viewTimes[0].endtime])
 							.range([0, width]);
 
 		var timeChart = d3.select(timesvg)
@@ -24,14 +24,12 @@ app.timelineD3 = function(timesvg, eventItem, height, width){
 								.attr('height', height + margin.top + margin.bottom)
 							.append('rect')
 								.attr({
-									'x': timeScale(new Date(data[0].starttime)),
-									'width': timeScale(new Date(data[0].endtime)) - timeScale(new Date(data[0].starttime)),
+									'x': timeScale(data[0].starttime),
+									'width': timeScale(data[0].endtime) - timeScale(data[0].starttime),
 									'y': height+2,
 									'height': 8,
-									'fill': '#ad0025',
-									'stroke': '#ad0025',
-									'stroke-width': 2,
-									'opacity': .75,
+									'fill': '#e20033',
+									'opacity': .7,
 									'rx': 2,
 									'ry': 2
 								})
@@ -50,7 +48,6 @@ app.timelineD3 = function(timesvg, eventItem, height, width){
 
 		timeAxis(timeGuide);
 
-
 }
 
 app.displayEvents = function(){
@@ -65,14 +62,6 @@ app.displayEvents = function(){
 	}).addTo(map);
 
 	app.eventList.forEach(function(eventItem){
-
-		// Process start / end times correct for UTC offset
-		eventItem.starttime = new Date(eventItem.starttime);
-		eventItem.starttime = new Date(eventItem.starttime.getFullYear(), eventItem.starttime.getMonth(), eventItem.starttime.getDate(), eventItem.starttime.getHours() + app.utcOffset,eventItem.starttime.getMinutes(),0)
-							.toISOString();
-		eventItem.endtime = new Date(eventItem.endtime);
-		eventItem.endtime = new Date(eventItem.endtime.getFullYear(), eventItem.endtime.getMonth(), eventItem.endtime.getDate(), eventItem.endtime.getHours() + app.utcOffset,eventItem.endtime.getMinutes(),0)
-							.toISOString();
 		
 		// Process event price
 		// see: http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
@@ -89,6 +78,7 @@ app.displayEvents = function(){
 		if (eventItem.price === 0){
 			eventItem.price = 'free';
 		}
+		// if numeric, add dollar sign
 		if (!isNaN(parseFloat(eventItem.price)) && isFinite(eventItem.price)){
 			eventItem.price = '$' + eventItem.price;
 		}
@@ -100,11 +90,15 @@ app.displayEvents = function(){
 		// timesvg div will contain the SVG time visual
 		var timesvg = $('<div>').addClass('timesvg');
 
-		// append event name
-		var name = $('<div>').append('<a href = "'+ eventItem.link + '" target="_blank">' + eventItem.eventname.toLowerCase() + '</a>').addClass('eventname');
+		// append event name with link to event website
+		var name = $('<div>')
+						.addClass('eventname')
+						.append('<a href = "'+ eventItem.link + '" target="_blank">' + eventItem.eventname.toLowerCase() + '</a>');
+		
 		// append price of admission
-
-		var price = $('<div>').append(eventItem.price.toLowerCase()).addClass('price');
+		var price = $('<div>')
+						.append(eventItem.price.toLowerCase())
+						.addClass('price');
 
 		// shortdesc div contains the short description of the event
 		var shortdesc = $('<div>')
@@ -210,9 +204,9 @@ app.init = function(){
 
 	app.utcOffset = parseInt(moment().format("Z").slice(0,3));
 
-	app.defaultStart = 9 + app.utcOffset;
+	app.defaultStart = 18;
 
-	app.defaultEnd = 6 + app.utcOffset;
+	app.defaultEnd = 3;
 
 	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), app.defaultStart,0,0)
 							.toISOString();
