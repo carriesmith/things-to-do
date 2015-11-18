@@ -25,7 +25,7 @@ body{
 	background-color: #403B3B;
 	color: #fff;
 	margin: 0;
-	padding: 40px 0px 10px 0px;
+	padding: 80px 0px 10px 0px;
 	border: 2px solid #322C2C;
 	font-size: 1.4em;
 	width: 100%;
@@ -35,7 +35,7 @@ body{
     /* Size and position */
     display: inline-block;
     position: relative;
-    width: 140px;
+    width: 180px;
     margin: 0 auto;
     padding: 0;
 	z-index: 10;
@@ -166,6 +166,16 @@ button:focus { outline:0 !important; }
 	border: 1px solid #322C2C;
 	background-color: #F8F3EB;
 	margin: 0px;
+}
+
+#eventList li.selected,
+#eventList li:hover {
+	background-color: #FFF;
+}
+
+#eventList li.selected rect,
+#eventList li:hover rect{
+	opacity: 1;
 }
 
 #eventList li:last-child{

@@ -1,6 +1,8 @@
 var app = {};
 
-app.timelineD3 = function(timesvg, eventItem, height, width){
+app.timelineD3 = function(timesvg, eventItem, height){
+
+		width = $('.info-container').width() - 20;
 
 		var viewTimes = [{starttime: new Date(app.starttime), endtime: new Date(app.endtime)}]
 		var data = [{starttime: new Date(eventItem.starttime), endtime: new Date(eventItem.endtime)}]
@@ -12,7 +14,7 @@ app.timelineD3 = function(timesvg, eventItem, height, width){
 						left: 20 };
 
 		var height = height - margin.top - margin.bottom,
-			width = width - margin.left - margin.right;
+				width = width - margin.left - margin.right;
 
 		var timeScale = d3.time.scale()
 							.domain([viewTimes[0].starttime, viewTimes[0].endtime])
@@ -50,8 +52,16 @@ app.timelineD3 = function(timesvg, eventItem, height, width){
 
 }
 
+app.resizeD3 = function(){
+
+
+	console.log(d3.selectAll('.timesvg'));
+
+}
+
 app.displayEvents = function(){
 
+	// Leaflet Map
 	var map = L.map('map', {closePopupOnClick: true}).setView([40.7, -74.0], 12);
 
 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -102,9 +112,10 @@ app.displayEvents = function(){
 
 		// shortdesc div contains the short description of the event
 		var shortdesc = $('<div>')
-								.append(eventItem.shortdesc)
-								.addClass('shortdesc');
+						.append(eventItem.shortdesc)
+						.addClass('shortdesc');
 		
+		// X button and listener to hide
 		var xButton = $('<div>')
 							.addClass('xbutton')
 							.append('<i class="fa fa-times"></i>')
@@ -113,6 +124,7 @@ app.displayEvents = function(){
 								map.removeLayer(eventItem.marker);
 							});
 
+		// Toggle view of event description
 		var viewButton = $('<div>')
 								.addClass('viewbutton')
 								.append('<i class="fa fa-caret-up"></i>')
@@ -122,6 +134,7 @@ app.displayEvents = function(){
 									$(this).find('i').toggleClass('fa-caret-down');
 								});
 
+		// Assemble event information section
 		var infosection = $('<div>')
 								.addClass('infosection')
 
@@ -131,18 +144,21 @@ app.displayEvents = function(){
 			.append(xButton)
 			.append(shortdesc);
 
-		// combine into a single list item
+		// Combine into a single list item
 		li.append(infosection)
 			.append(timesvg);
 
-		app.timelineD3(timesvg[0], eventItem, 30, 620);
+		// Add the D3 timeline
+		app.timelineD3(timesvg[0], eventItem, app.infosectionH);
 
-		// add start and end times as data attributes to list item element
+		// Add start and end times as data attributes to list item element (?)
 		li.attr('data-starttime', eventItem.starttime);
 		li.attr('data-endtime', eventItem.endtime);
 
+		// Append completed event information to ul
 		$('#eventList').append(li);	
 
+		// Add a marker to the Leaflet map
 		eventItem.marker = L.marker([eventItem.location[1], eventItem.location[0]]).addTo(map);
 		eventItem.marker.bindPopup(eventItem.eventname);
 
@@ -154,26 +170,23 @@ app.displayEvents = function(){
 		// 	$(li).removeClass('selected');
 		// });
 
+		// Hover over Leaflet marker --> highlight event list item
 		eventItem.marker.on('mouseover', function(){
 			$(li).addClass('selected');
 		});
-
 		eventItem.marker.on('mouseout', function(){
 			$(li).removeClass('selected');
 		});
 
+		// Hover over highlight event list item --> activate Leaflet marker
 		$(li).on('mouseover', function(){
-				console.log();
 				eventItem.marker.openPopup()
 			});
-
 		$(li).on('mouseout', function(){
-				console.log();
 				eventItem.marker.closePopup()
 			});
 
 	})
-
 }
 
 app.getData = function(){
@@ -195,24 +208,21 @@ app.getData = function(){
 			app.displayEvents();
 		}
 	});
-
 }
 
 app.init = function(){
 	
+	app.infosectionH = 30;
+
 	app.today = new Date();
-
-	app.utcOffset = parseInt(moment().format("Z").slice(0,3));
-
 	app.defaultStart = 18;
-
 	app.defaultEnd = 3;
-
 	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), app.defaultStart,0,0)
 							.toISOString();
 	app.endtime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, app.defaultEnd,0,0)
 							.toISOString();
 
+	// AJAX request to get and display events
 	app.getData();
 
 	// Dropdowns adapted from:
@@ -223,6 +233,7 @@ app.init = function(){
 	    this.placeholder = this.dd.children('span');
 	    this.opts = this.dd.find('ul.dropdown > li');
 	    this.val = '';
+	    this.lastval = null;  // preserve previous value
 	    this.index = -1;
 	    this.initEvents();
 	}
@@ -238,9 +249,15 @@ app.init = function(){
 
 	        obj.opts.on('click',function(){
 	            var opt = $(this);
+	            obj.lastval = obj.val;  
 	            obj.val = opt.text();
 	            obj.index = opt.index();
 	            obj.placeholder.text(obj.val);
+	            if (obj.val === obj.lastval){
+	            	console.log("Date Changed");
+	            }else{
+	            	console.log("SAME SAME");
+	            }
 	        });
 	    },
 	    getValue : function() {
@@ -259,15 +276,15 @@ app.init = function(){
 
 	$('.wrapper-dropdown').removeClass('active');
 
+	// make it sortable with jQuery UI
+	$('ul#eventList').sortable({
+	  connectWith: ".connected"
+	});
+
 };
 
 $(function() {
 
   app.init();
-
-  // make it sortable with jQuery UI
-  $('ul#eventList').sortable({
-    connectWith: ".connected"
-  });
 
 });
