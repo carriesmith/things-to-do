@@ -52,24 +52,24 @@ app.timelineD3 = function(timesvg, eventItem, height){
 
 }
 
-app.resizeD3 = function(){
-
-
-	console.log(d3.selectAll('.timesvg'));
-
-}
-
-app.displayEvents = function(){
+app.initMap = function(){
 
 	// Leaflet Map
-	var map = L.map('map', {closePopupOnClick: true}).setView([40.7, -74.0], 12);
+	app.map = L.map('map', {closePopupOnClick: true}).setView([40.7, -74.0], 12);
 
 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
 	    // attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
 	    maxZoom: 18,
 	    id: 'carriesmith.nii6d5je',
 	    accessToken: 'pk.eyJ1IjoiY2Fycmllc21pdGgiLCJhIjoiY2lmNGQ2MWloMDFmaXg0a3NibnpyY3I2bCJ9.MTvJHm90YDJtaIyxvvNoKw'
-	}).addTo(map);
+	}).addTo(app.map);
+
+}
+
+app.displayEvents = function(){
+
+	// Trash any existing events
+	$('.eventitem').remove();
 
 	app.eventList.forEach(function(eventItem){
 		
@@ -121,7 +121,7 @@ app.displayEvents = function(){
 							.append('<i class="fa fa-times"></i>')
 							.click(function(){
 								$(li).slideUp();
-								map.removeLayer(eventItem.marker);
+								app.map.removeLayer(eventItem.marker);
 							});
 
 		// Toggle view of event description
@@ -159,16 +159,8 @@ app.displayEvents = function(){
 		$('#eventList').append(li);	
 
 		// Add a marker to the Leaflet map
-		eventItem.marker = L.marker([eventItem.location[1], eventItem.location[0]]).addTo(map);
+		eventItem.marker = L.marker([eventItem.location[1], eventItem.location[0]]).addTo(app.map);
 		eventItem.marker.bindPopup(eventItem.eventname);
-
-		// $(eventItem.marker).mouseover(function(){
-		// 	$(li).addClass('selected');
-		// });
-
-		// $(eventItem.marker).mouseout(function(){
-		// 	$(li).removeClass('selected');
-		// });
 
 		// Hover over Leaflet marker --> highlight event list item
 		eventItem.marker.on('mouseover', function(){
@@ -189,9 +181,27 @@ app.displayEvents = function(){
 	})
 }
 
+app.populateDates = function (){
+
+	$('#date-select span').text( app.today.toString().split(' ').slice(0,4).join(' ') );
+
+	var date = app.today;
+	
+	var $dateList = $('#date-select .dropdown');
+	for (var i = 1; i<9; i++){
+		
+		var li = $('<li>')
+				.append('<a href="#">' + date.toString().split(' ').slice(0,4).join(' ') + '</a>' );
+		$dateList.append(li);
+		date.setDate(date.getDate() + 1)
+
+	}
+
+}
+
 app.getData = function(){
 		$.ajax({
-		url: 'http://localhost:3000/events/date/' + app.starttime + '/' + app.endtime,
+		url: 'http://localhost:3000/events/date/' + app.starttime.toISOString() + '/' + app.endtime.toISOString(),
 		type: 'GET',
 		dataType: 'json',
 		success: function(data){
@@ -210,6 +220,32 @@ app.getData = function(){
 	});
 }
 
+app.updateDate = function(datestring){
+
+	console.log("Date Changed");
+	var newstarttime = new Date(datestring);
+	newstarttime.setHours( app.starttime.getHours() );
+	newstarttime.setMinutes( app.starttime.getMinutes() ); // not currently necessary
+
+	var newendtime = new Date(datestring);
+	console.log("newendtime " + newendtime);
+	newendtime.setHours( app.endtime.getHours() );
+	console.log("newendtime " + newendtime);
+	newendtime.setMinutes( app.endtime.getMinutes() ); // not currently necessary	
+	console.log("newendtime " + newendtime);
+
+	// If the end time is earlier than the start time, assume we are rolling into the next morning
+	if ( newendtime < newstarttime ) {
+		newendtime.setDate( newendtime.getDate() + 1 );
+		console.log("if newendtime " + newendtime);
+	}
+
+	app.starttime = newstarttime;
+	app.endtime = newendtime;
+	app.getData();
+
+}
+
 app.init = function(){
 	
 	app.infosectionH = 30;
@@ -217,10 +253,11 @@ app.init = function(){
 	app.today = new Date();
 	app.defaultStart = 18;
 	app.defaultEnd = 3;
-	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), app.defaultStart,0,0)
-							.toISOString();
-	app.endtime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, app.defaultEnd,0,0)
-							.toISOString();
+	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), app.defaultStart,0,0);
+	app.endtime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, app.defaultEnd,0,0);
+
+	// Initialize the Map
+	app.initMap();
 
 	// AJAX request to get and display events
 	app.getData();
@@ -232,8 +269,8 @@ app.init = function(){
 	    this.dd = el;
 	    this.placeholder = this.dd.children('span');
 	    this.opts = this.dd.find('ul.dropdown > li');
-	    this.val = '';
-	    this.lastval = null;  // preserve previous value
+	    this.val = this.dd.children('span').text(); // save initial value
+	    this.lastval = this.val;  // preserve previous value
 	    this.index = -1;
 	    this.initEvents();
 	}
@@ -249,12 +286,12 @@ app.init = function(){
 
 	        obj.opts.on('click',function(){
 	            var opt = $(this);
-	            obj.lastval = obj.val;  
+	            obj.lastval = obj.val;
 	            obj.val = opt.text();
 	            obj.index = opt.index();
 	            obj.placeholder.text(obj.val);
-	            if (obj.val === obj.lastval){
-	            	console.log("Date Changed");
+	            if (obj.val !== obj.lastval){
+	            	app.updateDate(obj.val);
 	            }else{
 	            	console.log("SAME SAME");
 	            }
@@ -268,7 +305,9 @@ app.init = function(){
 	    }
 	}
 
+	app.populateDates();
 	app.ddDate = new DropDown( $('#date-select') );
+
 	app.ddSTime = new DropDown( $('#start-select') );
 	app.ddSTimeAMPM = new DropDown( $('#start-ampm') );
 	app.ddETime = new DropDown( $('#end-select') );
