@@ -164,7 +164,7 @@ app.createEvents = function(){
 
 		// Hover over Leaflet marker --> highlight event list item
 		eventItem.marker.on('mouseover', function(){
-			$('.eventList').scrollTop($('.eventList').scrollTop() + $(eventItem.li).position().top);
+			$('.info-container').scrollTop($('.info-container').scrollTop() + $(eventItem.li).position().top);
 			$(eventItem.li).addClass('selected');
 		});
 		eventItem.marker.on('mouseout', function(){
