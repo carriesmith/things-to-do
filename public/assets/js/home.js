@@ -75,8 +75,8 @@ app.createEvents = function(){
 	app.eventList.forEach(function(eventItem){
 		
 		// if the eventList item has not yet had a value set for the 'removed' flag, set it to false
-		if (eventList.removed == null) {
-			eventList.removed = false;
+		if (eventItem.removed == null) {
+			eventItem.removed = false;
 		}
 
 		// Process event price
@@ -164,6 +164,7 @@ app.createEvents = function(){
 
 		// Hover over Leaflet marker --> highlight event list item
 		eventItem.marker.on('mouseover', function(){
+			$('.eventList').scrollTop($('.eventList').scrollTop() + $(eventItem.li).position().top);
 			$(eventItem.li).addClass('selected');
 		});
 		eventItem.marker.on('mouseout', function(){
@@ -259,6 +260,11 @@ app.updateDate = function(datestring){
 app.init = function(){
 	
 	app.eventList = [];
+
+	removedEvents = localStorage['removedEvents'];
+	if (removedEvents == null) {
+		app.removedEvents = [];
+	}
 
 	app.infosectionH = 30;
 
@@ -426,6 +432,7 @@ app.init = function(){
 			app.createEvents();
 		}
 	})
+
 	$('.wrapper-dropdown').removeClass('active');
 
 	// make it sortable with jQuery UI
