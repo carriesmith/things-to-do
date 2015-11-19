@@ -66,13 +66,19 @@ app.initMap = function(){
 
 }
 
-app.displayEvents = function(){
+app.createEvents = function(){
 
 	// Trash any existing events
 	$('.eventitem').remove();
+	$('.leaflet-objects-pane').find('img').remove();
 
 	app.eventList.forEach(function(eventItem){
 		
+		// if the eventList item has not yet had a value set for the 'removed' flag, set it to false
+		if (eventList.removed == null) {
+			eventList.removed = false;
+		}
+
 		// Process event price
 		// see: http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
 		// parseFloat parses its argument, a string, and returns a floating point number. 
@@ -93,9 +99,8 @@ app.displayEvents = function(){
 			eventItem.price = '$' + eventItem.price;
 		}
 
-
 		// create new list item for an event
-		var li = $('<li>').addClass('eventitem');
+		eventItem.li = $('<li>').addClass('eventitem');
 
 		// timesvg div will contain the SVG time visual
 		var timesvg = $('<div>').addClass('timesvg');
@@ -120,8 +125,10 @@ app.displayEvents = function(){
 							.addClass('xbutton')
 							.append('<i class="fa fa-times"></i>')
 							.click(function(){
-								$(li).slideUp();
+								$(eventItem.li).slideUp();
+								// app.map.removeLayer(eventItem.marker);
 								app.map.removeLayer(eventItem.marker);
+								eventItem.removed = true;
 							});
 
 		// Toggle view of event description
@@ -145,38 +152,44 @@ app.displayEvents = function(){
 			.append(shortdesc);
 
 		// Combine into a single list item
-		li.append(infosection)
+		eventItem.li.append(infosection)
 			.append(timesvg);
 
 		// Add the D3 timeline
 		app.timelineD3(timesvg[0], eventItem, app.infosectionH);
 
-		// Add start and end times as data attributes to list item element (?)
-		li.attr('data-starttime', eventItem.starttime);
-		li.attr('data-endtime', eventItem.endtime);
-
-		// Append completed event information to ul
-		$('#eventList').append(li);	
-
 		// Add a marker to the Leaflet map
-		eventItem.marker = L.marker([eventItem.location[1], eventItem.location[0]]).addTo(app.map);
+		eventItem.marker = L.marker([eventItem.location[1], eventItem.location[0]]);
 		eventItem.marker.bindPopup(eventItem.eventname);
 
 		// Hover over Leaflet marker --> highlight event list item
 		eventItem.marker.on('mouseover', function(){
-			$(li).addClass('selected');
+			$(eventItem.li).addClass('selected');
 		});
 		eventItem.marker.on('mouseout', function(){
-			$(li).removeClass('selected');
+			$(eventItem.li).removeClass('selected');
 		});
 
 		// Hover over highlight event list item --> activate Leaflet marker
-		$(li).on('mouseover', function(){
+		$(eventItem.li).on('mouseover', function(){
 				eventItem.marker.openPopup()
 			});
-		$(li).on('mouseout', function(){
+		$(eventItem.li).on('mouseout', function(){
 				eventItem.marker.closePopup()
 			});
+
+		// CHECK WHETHER SHOULD BE VISIBLE
+		if (eventItem.removed || new Date(eventItem.starttime) < app.starttime || new Date(eventItem.endtime) > app.endtime){
+			eventItem.li.addClass('hide');
+			eventItem.visible = false;
+		} else {
+			eventItem.li.removeClass('hide');
+			eventItem.visible = true;
+			eventItem.marker.addTo(app.map);
+		}
+
+		// Append completed event information to ul
+		$('#eventList').append(eventItem.li);	
 
 	})
 }
@@ -201,7 +214,7 @@ app.populateDates = function (){
 
 app.getData = function(){
 		$.ajax({
-		url: 'http://localhost:3000/events/date/' + app.starttime.toISOString() + '/' + app.endtime.toISOString(),
+		url: 'http://localhost:3000/events/date/' + app.startdate.toISOString() + '/' + app.enddate.toISOString(),
 		type: 'GET',
 		dataType: 'json',
 		success: function(data){
@@ -215,44 +228,47 @@ app.getData = function(){
 
 				return 0;
 			})
-			app.displayEvents();
+			app.createEvents();
 		}
 	});
 }
 
 app.updateDate = function(datestring){
 
-	console.log("Date Changed");
 	var newstarttime = new Date(datestring);
 	newstarttime.setHours( app.starttime.getHours() );
 	newstarttime.setMinutes( app.starttime.getMinutes() ); // not currently necessary
 
 	var newendtime = new Date(datestring);
-	console.log("newendtime " + newendtime);
 	newendtime.setHours( app.endtime.getHours() );
-	console.log("newendtime " + newendtime);
 	newendtime.setMinutes( app.endtime.getMinutes() ); // not currently necessary	
-	console.log("newendtime " + newendtime);
 
 	// If the end time is earlier than the start time, assume we are rolling into the next morning
 	if ( newendtime < newstarttime ) {
 		newendtime.setDate( newendtime.getDate() + 1 );
-		console.log("if newendtime " + newendtime);
 	}
 
 	app.starttime = newstarttime;
 	app.endtime = newendtime;
-	app.getData();
+
+	app.startdate = new Date(app.starttime.getFullYear(), app.starttime.getMonth(), app.starttime.getDate(), 0,0,0);
+	app.enddate = new Date(app.starttime.getFullYear(), app.starttime.getMonth(), app.starttime.getDate() + 1, 23,59,59);
 
 }
 
 app.init = function(){
 	
+	app.eventList = [];
+
 	app.infosectionH = 30;
 
 	app.today = new Date();
 	app.defaultStart = 18;
 	app.defaultEnd = 3;
+
+	app.startdate = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), 0,0,0);
+	app.enddate = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, 23,59,59);
+
 	app.starttime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), app.defaultStart,0,0);
 	app.endtime = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, app.defaultEnd,0,0);
 
@@ -290,11 +306,7 @@ app.init = function(){
 	            obj.val = opt.text();
 	            obj.index = opt.index();
 	            obj.placeholder.text(obj.val);
-	            if (obj.val !== obj.lastval){
-	            	app.updateDate(obj.val);
-	            }else{
-	            	console.log("SAME SAME");
-	            }
+	            console.log(obj.val);
 	        });
 	    },
 	    getValue : function() {
@@ -307,12 +319,113 @@ app.init = function(){
 
 	app.populateDates();
 	app.ddDate = new DropDown( $('#date-select') );
+	app.ddDate.opts.on('click', function(){
+		if (app.ddDate.lastval != app.ddDate.val){
+				app.updateDate(app.ddDate.val);
+				app.getData();
+			}
+	})
 
 	app.ddSTime = new DropDown( $('#start-select') );
-	app.ddSTimeAMPM = new DropDown( $('#start-ampm') );
-	app.ddETime = new DropDown( $('#end-select') );
-	app.ddETimeAMPM = new DropDown( $('#end-ampm') );
+	app.ddSTime.opts.on('click', function(){
+		if (app.ddSTime.lastval != app.ddSTime.val){
+				
+				// if PM and select 12 --> noon
+				if (parseInt(app.ddSTime.val) === 12 && app.starttime.getHours()>=12) {
+					app.starttime.setHours(12);  // noon
 
+				// if AM and select 12 --> midnight
+				} else if (parseInt(app.ddSTime.val) === 12 && app.starttime.getHours()<12) {
+					app.starttime.setHours(0);  // then midnight
+
+				// if PM and not 12 --> add 12 to time
+				} else if (app.starttime.getHours()>=12){
+					app.starttime.setHours(parseInt(app.ddSTime.val) + 12) 
+
+				// else AM
+				} else {
+					app.starttime.setHours(parseInt(app.ddSTime.val))
+				}
+
+				app.endtime.setDate( app.starttime.getDate() );
+				if ( app.starttime > app.endtime ) {
+					app.endtime.setDate( app.endtime.getDate() + 1 );
+				}
+
+				console.log(app.starttime);
+				console.log(app.endtime);
+
+				app.createEvents();
+			}
+	})
+
+	app.ddSTimeAMPM = new DropDown( $('#start-ampm') );
+	app.ddSTimeAMPM.opts.on('click', function(){
+		if (app.ddSTimeAMPM.lastval != app.ddSTimeAMPM.val){
+			// was midnight --> noon
+			if (app.ddSTimeAMPM.val.toLowerCase() === "pm"){
+				app.starttime.setHours( app.starttime.getHours() + 12 );
+			} else {
+				app.starttime.setHours( app.starttime.getHours() - 12 );
+			}
+
+			app.endtime.setDate( app.starttime.getDate() );
+			if ( app.starttime > app.endtime ) {
+				app.endtime.setDate( app.endtime.getDate() + 1 );
+			}
+
+			app.createEvents();
+		}
+	})
+
+	app.ddETime = new DropDown( $('#end-select') );
+	app.ddETime.opts.on('click', function(){
+		if (app.ddETime.lastval != app.ddETime.val){
+				
+				// if PM and select 12 --> noon
+				if (parseInt(app.ddETime.val) === 12 && app.endtime.getHours()>=12) {
+					app.endtime.setHours(12);  // noon
+
+				// if AM and select 12 --> midnight
+				} else if (parseInt(app.ddETime.val) === 12 && app.endtime.getHours()<12) {
+					app.endtime.setHours(0);  // then midnight
+
+				// if PM and not 12 --> add 12 to time
+				} else if (app.endtime.getHours()>=12){
+					app.endtime.setHours(parseInt(app.ddETime.val) + 12) 
+
+				// else AM
+				} else {
+					app.endtime.setHours(parseInt(app.ddETime.val))
+				}
+
+				app.endtime.setDate( app.starttime.getDate() );
+				if ( app.starttime > app.endtime ) {
+					app.endtime.setDate( app.endtime.getDate() + 1 );
+				}
+
+				app.createEvents();
+			}
+	})
+
+	app.ddETimeAMPM = new DropDown( $('#end-ampm') );
+	app.ddETimeAMPM.opts.on('click', function(){
+		if (app.ddETimeAMPM.lastval != app.ddETimeAMPM.val){
+			// was midnight --> noon
+			if (app.ddETimeAMPM.val.toLowerCase() === "pm"){
+				app.endtime.setHours( app.endtime.getHours() + 12 );
+			} else {
+				app.endtime.setHours( app.endtime.getHours() - 12 );
+			}
+
+			app.endtime.setDate( app.starttime.getDate() );
+			if ( app.starttime > app.endtime ) {
+				app.endtime.setDate( app.endtime.getDate() + 1 );
+			}
+
+			app.createEvents();
+		}
+	})
 	$('.wrapper-dropdown').removeClass('active');
 
 	// make it sortable with jQuery UI

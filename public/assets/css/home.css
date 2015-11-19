@@ -184,6 +184,10 @@ button:focus { outline:0 !important; }
 
 /* Styling event information section */
 
+.hide {
+  display: none;
+}
+
 .infosection {
 	position: relative;
 	padding: 5px 5px 0px;
