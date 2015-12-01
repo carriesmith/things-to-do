@@ -66,6 +66,28 @@ app.initMap = function(){
 
 }
 
+// Function for callback when event x is clicked
+
+app.removeEvent = function(eventItem){
+
+	$(eventItem.li).slideUp();
+	// app.map.removeLayer(eventItem.marker);
+	app.map.removeLayer(eventItem.marker);
+	eventItem.removed = true;
+	app.removedEvents.push(eventItem['_id']);
+	localStorage['removedEvents'] = JSON.stringify(app.removedEvents);
+
+};
+
+// Convenience function to clear the list of removed events from local storage
+
+app.clearRemovedEvents = function(){
+		delete localStorage['removedEvents'];
+}
+
+// Creates and appends an li element for each event in eventList
+// if the element has been removed or is outside of the time range specified,
+// visibility is set to hidden
 app.createEvents = function(){
 
 	// Trash any existing events
@@ -75,8 +97,10 @@ app.createEvents = function(){
 	app.eventList.forEach(function(eventItem){
 		
 		// if the eventList item has not yet had a value set for the 'removed' flag, set it to false
-		if (eventItem.removed == null) {
+		if ( app.removedEvents.indexOf(eventItem['_id']) === -1 ) {
 			eventItem.removed = false;
+		} else {
+			eventItem.removed = true;
 		}
 
 		// Process event price
@@ -125,10 +149,7 @@ app.createEvents = function(){
 							.addClass('xbutton')
 							.append('<i class="fa fa-times"></i>')
 							.click(function(){
-								$(eventItem.li).slideUp();
-								// app.map.removeLayer(eventItem.marker);
-								app.map.removeLayer(eventItem.marker);
-								eventItem.removed = true;
+								app.removeEvent(eventItem);
 							});
 
 		// Toggle view of event description
@@ -166,10 +187,10 @@ app.createEvents = function(){
 		eventItem.marker.on('mouseover', function(){
 			var scrollVal = $(eventItem.li).position().top < 0 ? 0 : $('.info-container').scrollTop() + $(eventItem.li).position().top;
 
-			console.log(scrollVal);
 			$('.info-container').scrollTop(scrollVal);
 			$(eventItem.li).addClass('selected');
 		});
+
 		eventItem.marker.on('mouseout', function(){
 			$(eventItem.li).removeClass('selected');
 		});
@@ -196,7 +217,7 @@ app.createEvents = function(){
 		$('#eventList').append(eventItem.li);	
 
 	})
-}
+};
 
 app.populateDates = function (){
 
@@ -211,7 +232,6 @@ app.populateDates = function (){
 				.append('<a href="#">' + date.toString().split(' ').slice(0,4).join(' ') + '</a>' );
 		$dateList.append(li);
 		date.setDate(date.getDate() + 1)
-
 	}
 
 }
@@ -237,6 +257,7 @@ app.getData = function(){
 	});
 }
 
+// Update the app starttime and endtime
 app.updateDate = function(datestring){
 
 	var newstarttime = new Date(datestring);
@@ -255,6 +276,7 @@ app.updateDate = function(datestring){
 	app.starttime = newstarttime;
 	app.endtime = newendtime;
 
+
 	app.startdate = new Date(app.starttime.getFullYear(), app.starttime.getMonth(), app.starttime.getDate(), 0,0,0);
 	app.enddate = new Date(app.starttime.getFullYear(), app.starttime.getMonth(), app.starttime.getDate() + 1, 23,59,59);
 
@@ -264,17 +286,25 @@ app.init = function(){
 	
 	app.eventList = [];
 
-	removedEvents = localStorage['removedEvents'];
-	if (removedEvents == null) {
+	if(localStorage['removedEvents']){
+		app.removedEvents = JSON.parse(localStorage['removedEvents']);
+	}else{
 		app.removedEvents = [];
 	}
 
 	app.infosectionH = 30;
 
 	app.today = new Date();
+
+	// TODO: Save start / end times in localStorage
 	app.defaultStart = 18;
 	app.defaultEnd = 3;
 
+	// In order to cache relevant data, startdate and enddate are set to cover a 47.59.59 hour period
+	// from midnight on the first day through 23:59:59 on the second.
+	// All events are loaded from the API, and prepared for view.
+	// Changing the hours alters whether or not events are visible, but does not require 
+	// an AJAX request.
 	app.startdate = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate(), 0,0,0);
 	app.enddate = new Date(app.today.getFullYear(), app.today.getMonth(), app.today.getDate() + 1, 23,59,59);
 
@@ -315,7 +345,6 @@ app.init = function(){
 	            obj.val = opt.text();
 	            obj.index = opt.index();
 	            obj.placeholder.text(obj.val);
-	            console.log(obj.val);
 	        });
 	    },
 	    getValue : function() {
@@ -360,9 +389,6 @@ app.init = function(){
 				if ( app.starttime > app.endtime ) {
 					app.endtime.setDate( app.endtime.getDate() + 1 );
 				}
-
-				console.log(app.starttime);
-				console.log(app.endtime);
 
 				app.createEvents();
 			}
@@ -418,6 +444,7 @@ app.init = function(){
 	})
 
 	app.ddETimeAMPM = new DropDown( $('#end-ampm') );
+
 	app.ddETimeAMPM.opts.on('click', function(){
 		if (app.ddETimeAMPM.lastval != app.ddETimeAMPM.val){
 			// was midnight --> noon
