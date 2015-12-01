@@ -1,5 +1,6 @@
 var app = {};
 
+// Create D3 timeline
 app.timelineD3 = function(timesvg, eventItem, height){
 
 		width = $('.info-container').width() - 20;
@@ -52,6 +53,7 @@ app.timelineD3 = function(timesvg, eventItem, height){
 
 }
 
+// Initialize the Leaflet Map
 app.initMap = function(){
 
 	// Leaflet Map
@@ -67,7 +69,6 @@ app.initMap = function(){
 }
 
 // Function for callback when event x is clicked
-
 app.removeEvent = function(eventItem){
 
 	$(eventItem.li).slideUp();
@@ -80,7 +81,6 @@ app.removeEvent = function(eventItem){
 };
 
 // Convenience function to clear the list of removed events from local storage
-
 app.clearRemovedEvents = function(){
 		delete localStorage['removedEvents'];
 }
@@ -91,6 +91,7 @@ app.clearRemovedEvents = function(){
 app.createEvents = function(){
 
 	// Trash any existing events
+	$('.noEventsFound').remove();
 	$('.eventitem').remove();
 	$('.leaflet-objects-pane').find('img').remove();
 
@@ -103,120 +104,133 @@ app.createEvents = function(){
 			eventItem.removed = true;
 		}
 
-		// Process event price
-		// see: http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
-		// parseFloat parses its argument, a string, and returns a floating point number. 
-		// 		If it encounters a character other than a sign (+ or -), numeral (0-9), a decimal point, 
-		// 		or an exponent, it returns the value up to that point and ignores that character 
-		// 		and all succeeding characters. Leading and trailing spaces are allowed.
-		// 		If the first character cannot be converted to a number, parseFloat returns NaN.
-		// isFinite used to determine whether a number is a finite number. 
-		// 		The isFinite function examines the number in its argument. 
-		// 		If the argument is NaN, positive infinity, or negative infinity, 
-		// 		this method returns false; otherwise, it returns true.
+		if (!eventItem.removed && new Date(eventItem.starttime) >= app.starttime && new Date(eventItem.endtime) <= app.endtime){
 
-		if (eventItem.price === 0){
-			eventItem.price = 'free';
-		}
-		// if numeric, add dollar sign
-		if (!isNaN(parseFloat(eventItem.price)) && isFinite(eventItem.price)){
-			eventItem.price = '$' + eventItem.price;
-		}
+			// Process event price
+			// see: http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
+			// parseFloat parses its argument, a string, and returns a floating point number. 
+			// 		If it encounters a character other than a sign (+ or -), numeral (0-9), a decimal point, 
+			// 		or an exponent, it returns the value up to that point and ignores that character 
+			// 		and all succeeding characters. Leading and trailing spaces are allowed.
+			// 		If the first character cannot be converted to a number, parseFloat returns NaN.
+			// isFinite used to determine whether a number is a finite number. 
+			// 		The isFinite function examines the number in its argument. 
+			// 		If the argument is NaN, positive infinity, or negative infinity, 
+			// 		this method returns false; otherwise, it returns true.
 
-		// create new list item for an event
-		eventItem.li = $('<li>').addClass('eventitem');
+			if (eventItem.price === 0){
+				eventItem.price = 'free';
+			}
+			// if numeric, add dollar sign
+			if (!isNaN(parseFloat(eventItem.price)) && isFinite(eventItem.price)){
+				eventItem.price = '$' + eventItem.price;
+			}
 
-		// timesvg div will contain the SVG time visual
-		var timesvg = $('<div>').addClass('timesvg');
+			// create new list item for an event
+			eventItem.li = $('<li>').addClass('eventitem');
 
-		// append event name with link to event website
-		var name = $('<div>')
-						.addClass('eventname')
-						.append('<a href = "'+ eventItem.link + '" target="_blank">' + eventItem.eventname.toLowerCase() + '</a>');
-		
-		// append price of admission
-		var price = $('<div>')
-						.append(eventItem.price.toLowerCase())
-						.addClass('price');
+			// timesvg div will contain the SVG time visual
+			var timesvg = $('<div>').addClass('timesvg');
 
-		// shortdesc div contains the short description of the event
-		var shortdesc = $('<div>')
-						.append(eventItem.shortdesc)
-						.addClass('shortdesc');
-		
-		// X button and listener to hide
-		var xButton = $('<div>')
-							.addClass('xbutton')
-							.append('<i class="fa fa-times"></i>')
-							.click(function(){
-								app.removeEvent(eventItem);
-							});
+			// append event name with link to event website
+			var name = $('<div>')
+							.addClass('eventname')
+							.append('<a href = "'+ eventItem.link + '" target="_blank">' + eventItem.eventname.toLowerCase() + '</a>');
+			
+			// append price of admission
+			var price = $('<div>')
+							.append(eventItem.price.toLowerCase())
+							.addClass('price');
 
-		// Toggle view of event description
-		var viewButton = $('<div>')
-								.addClass('viewbutton')
-								.append('<i class="fa fa-caret-up"></i>')
+			// shortdesc div contains the short description of the event
+			var shortdesc = $('<div>')
+							.append(eventItem.shortdesc)
+							.addClass('shortdesc');
+			
+			// X button and listener to hide
+			var xButton = $('<div>')
+								.addClass('xbutton')
+								.append('<i class="fa fa-times"></i>')
 								.click(function(){
-									$(shortdesc).toggleClass('open');
-									$(this).find('i').toggleClass('fa-caret-up');
-									$(this).find('i').toggleClass('fa-caret-down');
+									app.removeEvent(eventItem);
 								});
 
-		// Assemble event information section
-		var infosection = $('<div>')
-								.addClass('infosection')
+			// Toggle view of event description
+			var viewButton = $('<div>')
+									.addClass('viewbutton')
+									.append('<i class="fa fa-caret-up"></i>')
+									.click(function(){
+										$(shortdesc).toggleClass('open');
+										$(this).find('i').toggleClass('fa-caret-up');
+										$(this).find('i').toggleClass('fa-caret-down');
+									});
 
-		infosection.append(name)
-			.append(price)
-			.append(viewButton)
-			.append(xButton)
-			.append(shortdesc);
+			// Assemble event information section
+			var infosection = $('<div>')
+									.addClass('infosection')
 
-		// Combine into a single list item
-		eventItem.li.append(infosection)
-			.append(timesvg);
+			infosection.append(name)
+				.append(price)
+				.append(viewButton)
+				.append(xButton)
+				.append(shortdesc);
 
-		// Add the D3 timeline
-		app.timelineD3(timesvg[0], eventItem, app.infosectionH);
+			// Combine into a single list item
+			eventItem.li.append(infosection)
+				.append(timesvg);
 
-		// Add a marker to the Leaflet map
-		eventItem.marker = L.marker([eventItem.location[1], eventItem.location[0]]);
-		eventItem.marker.bindPopup(eventItem.eventname);
+			// Add the D3 timeline
+			app.timelineD3(timesvg[0], eventItem, app.infosectionH);
 
-		// Hover over Leaflet marker --> highlight event list item
-		eventItem.marker.on('mouseover', function(){
-			var scrollVal = $(eventItem.li).position().top < 0 ? 0 : $('.info-container').scrollTop() + $(eventItem.li).position().top;
+			// Add a marker to the Leaflet map
+			eventItem.marker = L.marker([eventItem.location[1], eventItem.location[0]]);
+			eventItem.marker.bindPopup(eventItem.eventname);
 
-			$('.info-container').scrollTop(scrollVal);
-			$(eventItem.li).addClass('selected');
-		});
+			// Hover over Leaflet marker --> highlight event list item
+			eventItem.marker.on('mouseover', function(){
+				var scrollVal = $(eventItem.li).position().top < 0 ? 0 : $('.info-container').scrollTop() + $(eventItem.li).position().top;
 
-		eventItem.marker.on('mouseout', function(){
-			$(eventItem.li).removeClass('selected');
-		});
-
-		// Hover over highlight event list item --> activate Leaflet marker
-		$(eventItem.li).on('mouseover', function(){
-				eventItem.marker.openPopup()
-			});
-		$(eventItem.li).on('mouseout', function(){
-				eventItem.marker.closePopup()
+				$('.info-container').scrollTop(scrollVal);
+				$(eventItem.li).addClass('selected');
 			});
 
-		// CHECK WHETHER SHOULD BE VISIBLE
-		if (eventItem.removed || new Date(eventItem.starttime) < app.starttime || new Date(eventItem.endtime) > app.endtime){
-			eventItem.li.addClass('hide');
-			eventItem.visible = false;
-		} else {
-			eventItem.li.removeClass('hide');
+			eventItem.marker.on('mouseout', function(){
+				$(eventItem.li).removeClass('selected');
+			});
+
+			// Hover over highlight event list item --> activate Leaflet marker
+			$(eventItem.li).on('mouseover', function(){
+					eventItem.marker.openPopup()
+				});
+			$(eventItem.li).on('mouseout', function(){
+					eventItem.marker.closePopup()
+				});
+
+			// CHECK WHETHER SHOULD BE VISIBLE
+			// if (eventItem.removed || new Date(eventItem.starttime) < app.starttime || new Date(eventItem.endtime) > app.endtime){
+			// 	eventItem.li.addClass('hide');
+			// 	eventItem.visible = false;
+			// } else {
+			// 	eventItem.li.removeClass('hide');
+			// 	eventItem.visible = true;
+			// 	eventItem.marker.addTo(app.map);
+			// }
+
 			eventItem.visible = true;
 			eventItem.marker.addTo(app.map);
-		}
 
-		// Append completed event information to ul
-		$('#eventList').append(eventItem.li);	
+			// Append completed event information to ul
+			$('#eventList').append(eventItem.li);	
 
-	})
+		}; // end if (eventItem.removed || new Date(eventItem.starttime) < app.starttime || new Date(eventItem.endtime) > app.endtime)
+	
+	}); // end app.eventList.forEach
+	
+	if ($('#eventList li').length === 0){
+		var li = $('<li>').addClass('noEventsFound').text("No matching events. Check back later.")
+		$('#eventList').append(li);	
+	} 
+
 };
 
 app.populateDates = function (){
@@ -332,40 +346,49 @@ app.init = function(){
 
 	DropDown.prototype = {
 	    initEvents : function() {
-	        var obj = this;
+	        // var obj = this;
 
-	        obj.dd.on('click', function(event){
+	        this.dd.on('click', function(event){
 	            $(this).toggleClass('active');
 	            return false;
 	        });
 
-	        obj.opts.on('click',function(){
-	            var opt = $(this);
-	            obj.lastval = obj.val;
-	            obj.val = opt.text();
-	            obj.index = opt.index();
-	            obj.placeholder.text(obj.val);
-	        });
+	        // obj.opts.on('click',function(){
+	        //     var opt = $(this);
+	        //     obj.lastval = obj.val;
+	        //     obj.val = opt.text();
+	        //     obj.index = opt.index();
+	        //     obj.placeholder.text(obj.val);
+	        // });
 	    },
 	    getValue : function() {
 	        return this.val;
 	    },
 	    getIndex : function() {
 	        return this.index;
+	    },
+	    optionHandler: function(opt){
+	    	this.lastval = this.val;
+	    	this.val = opt.text();
+	    	this.index = opt.index();
+	    	this.placeholder.text(this.val);
 	    }
 	}
 
 	app.populateDates();
 	app.ddDate = new DropDown( $('#date-select') );
 	app.ddDate.opts.on('click', function(){
+		app.ddDate.optionHandler($(this));
 		if (app.ddDate.lastval != app.ddDate.val){
 				app.updateDate(app.ddDate.val);
 				app.getData();
 			}
-	})
+	});
 
 	app.ddSTime = new DropDown( $('#start-select') );
 	app.ddSTime.opts.on('click', function(){
+		app.ddSTime.optionHandler($(this));
+
 		if (app.ddSTime.lastval != app.ddSTime.val){
 				
 				// if PM and select 12 --> noon
@@ -396,6 +419,7 @@ app.init = function(){
 
 	app.ddSTimeAMPM = new DropDown( $('#start-ampm') );
 	app.ddSTimeAMPM.opts.on('click', function(){
+		app.ddSTimeAMPM.optionHandler($(this));
 		if (app.ddSTimeAMPM.lastval != app.ddSTimeAMPM.val){
 			// was midnight --> noon
 			if (app.ddSTimeAMPM.val.toLowerCase() === "pm"){
@@ -415,6 +439,7 @@ app.init = function(){
 
 	app.ddETime = new DropDown( $('#end-select') );
 	app.ddETime.opts.on('click', function(){
+		app.ddETime.optionHandler($(this));
 		if (app.ddETime.lastval != app.ddETime.val){
 				
 				// if PM and select 12 --> noon
@@ -446,6 +471,7 @@ app.init = function(){
 	app.ddETimeAMPM = new DropDown( $('#end-ampm') );
 
 	app.ddETimeAMPM.opts.on('click', function(){
+		app.ddETimeAMPM.optionHandler($(this));
 		if (app.ddETimeAMPM.lastval != app.ddETimeAMPM.val){
 			// was midnight --> noon
 			if (app.ddETimeAMPM.val.toLowerCase() === "pm"){
